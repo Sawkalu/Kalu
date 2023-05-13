@@ -1,0 +1,11 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use './tonal-button';
+
+@include tonal-button.static-styles();
+
+/// TODO: variant-specific theme styles.
