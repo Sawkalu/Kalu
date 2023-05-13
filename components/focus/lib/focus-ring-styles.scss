@@ -1,0 +1,13 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@use './focus-ring';
+@use './focus-ring-theme';
+
+@include focus-ring.static-styles;
+
+.md3-focus-ring {
+  @include focus-ring-theme.theme-styles(focus-ring-theme.$light-theme);
+}
