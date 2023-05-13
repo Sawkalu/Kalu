@@ -1,0 +1,16 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@use 'sass:map';
+
+@mixin theme-styles($theme) {
+  @include _container-height(map.get($theme, container-height));
+}
+
+@mixin _container-height($height) {
+  .md3-field__container {
+    flex-basis: $height;
+  }
+}
