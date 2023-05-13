@@ -1,0 +1,52 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@use 'sass:map';
+
+@mixin static-styles() {
+  :host {
+    @include host;
+  }
+
+  .md3-test-table {
+    @include table;
+  }
+
+  .md3-test-table__cell {
+    @include cell;
+  }
+
+  .md3-test-table__header {
+    @include header;
+  }
+}
+
+@mixin host() {
+  display: flex;
+}
+
+@mixin table() {
+  border: 1px solid;
+  border-collapse: collapse;
+  z-index: -1; // Allow background grid to be placed behind content
+}
+
+@mixin cell() {
+  border: 1px solid;
+  position: relative;
+
+  &::before {
+    inset: -1px 0 0 -1px;
+    content: '';
+    position: absolute;
+    z-index: -1;
+  }
+}
+
+@mixin header() {
+  border: 1px solid;
+  border-top: none;
+  caption-side: bottom;
+}
