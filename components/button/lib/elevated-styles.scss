@@ -1,0 +1,16 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use './elevated-button';
+@use './elevated-button-theme';
+
+@include elevated-button.static-styles();
+
+.md3-button--elevated {
+  @include elevated-button-theme.theme-styles(
+    elevated-button-theme.$light-theme
+  );
+}
