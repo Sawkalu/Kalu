@@ -1,0 +1,29 @@
+/**
+ * @license
+ * Copyright 2020 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use '@material/theme/theme';
+@use '@material/slider/slider' as mdc-slider;
+@use './slider-theme';
+
+@mixin core-styles() {
+  @include static-styles();
+  @include slider-theme.theme-styles(slider-theme.$light-theme);
+}
+
+@mixin static-styles() {
+  @include mdc-slider.static-styles();
+
+  :host {
+    outline: none;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ripple {
+    // TODO: Use ripple's theme mixin once it actually works with mwc-ripple.
+    @include theme.property(--mdc-ripple-color, primary);
+  }
+}
