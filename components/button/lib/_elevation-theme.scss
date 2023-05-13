@@ -1,0 +1,94 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'sass:map';
+@use 'sass:meta';
+@use '@material/ripple/ripple-theme';
+@use '@material/theme/state';
+@use '@material/theme/theme';
+@use 'third_party/javascript/material_web_components/m3/tokens/resolvers';
+@use 'third_party/javascript/material_web_components/m3/elevation/lib/elevation-theme';
+@use 'third_party/javascript/material_web_components/m3/elevation/lib/elevation-overlay-theme';
+
+@use './button-theme';
+
+$_selectors: button-theme.$selectors;
+
+@mixin theme-styles($theme, $resolvers) {
+  $elevation-resolver: map.get($resolvers, elevation);
+  @include _elevation(
+    $elevation-resolver,
+    $elevation-map: (
+      default: map.get($theme, container-elevation),
+      disabled: map.get($theme, disabled-container-elevation),
+      focus: map.get($theme, focus-container-elevation),
+      hover: map.get($theme, hover-container-elevation),
+      pressed: map.get($theme, pressed-container-elevation)
+    ),
+    $shadow-color: map.get($theme, container-shadow-color),
+    $overlay-tint-color: map.get($theme, surface-tint-layer-color)
+  );
+}
+
+@mixin _elevation(
+  $elevation-resolver,
+  $elevation-map,
+  $shadow-color,
+  $overlay-tint-color
+) {
+  @include elevation-theme.with-resolver(
+    $elevation-resolver,
+    $selectors: $_selectors,
+    $elevation: $elevation-map,
+    $shadow-color: $shadow-color
+  );
+
+  @include elevation-overlay-theme.theme-styles(
+    (
+      surface-tint-layer-color: $overlay-tint-color,
+    ),
+    $selectors: $_selectors
+  );
+}
+
+@function resolve-theme-elevation-keys($theme, $resolver) {
+  @if $resolver == null {
+    @return $theme;
+  }
+  $shadow-color: map.get($theme, container-shadow-color);
+
+  $elevation-keys: (
+    container-elevation,
+    hover-container-elevation,
+    focus-container-elevation,
+    pressed-container-elevation,
+    disabled-container-elevation
+  );
+
+  @each $key in $elevation-keys {
+    $elevation-level: map.get($theme, $key);
+    @if $elevation-level != null {
+      // Unlike `theme-styles`, which delegates to elevation module to resolve
+      // each state's elevation and place it under the correct selector, for
+      // runtime theming the state is managed here and the elevation resolver is
+      // passed a stateless (default state) value. This allows us to cleanly
+      // attach each state's resolved value to its corresponding key in
+      // $elevation-keys, without worrying about having to strip state prefixes
+      // from the resolved keys to match the `theme-styles` CSS custom prop names.
+      $elevation: (
+        default: $elevation-level,
+      );
+      $resolved-value: meta.call(
+        $resolver,
+        $elevation: $elevation,
+        $shadow-color: $shadow-color
+      );
+      // Update the key with the resolved value.
+      $theme: map.set($theme, $key, $resolved-value);
+    }
+  }
+  @return $theme;
+}

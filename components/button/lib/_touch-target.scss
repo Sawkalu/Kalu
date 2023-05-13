@@ -1,0 +1,13 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use '@material/touch-target/touch-target';
+
+@mixin static-styles() {
+  .md3-button__touch {
+    @include touch-target.touch-target;
+  }
+}
