@@ -1,0 +1,28 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// stylelint-disable selector-class-pattern --
+// Selector '.mdc-*' should only be used in this project.
+
+@mixin static-styles() {
+  .mdc-button__outline {
+    @include outline;
+  }
+  .mdc-button__ripple {
+    border-style: solid;
+    border-color: transparent;
+  }
+}
+
+@mixin outline() {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-style: solid;
+  box-sizing: border-box;
+}
