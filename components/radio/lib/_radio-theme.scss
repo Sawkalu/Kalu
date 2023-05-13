@@ -1,0 +1,434 @@
+//
+// Copyright 2022 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// stylelint-disable selector-class-pattern --
+// Selector '.md3-*' should only be used in this project.
+
+@use 'sass:map';
+@use 'sass:selector';
+@use '@material/density/functions' as density-functions;
+@use '@material/theme/theme' as mdc-theme;
+@use '@material/theme/keys';
+@use '@material/density/variables' as density-variables;
+@use '@material/theme/theme-color';
+@use '@material/theme/shadow-dom';
+@use '../../ripple/ripple-theme';
+@use '../../sass/theme';
+
+$ripple-size: 40px !default;
+$icon-size: 20px !default;
+$transition-duration: 120ms !default;
+$ripple-opacity: 0.14 !default;
+$baseline-theme-color: secondary !default;
+$unchecked-color: rgba(theme-color.prop-value(on-surface), 0.54) !default;
+$disabled-circle-color: rgba(theme-color.prop-value(on-surface), 0.38) !default;
+
+$minimum-size: 28px !default;
+$maximum-size: $ripple-size !default;
+$density-scale: density-variables.$default-scale !default;
+$density-config: (
+  size: (
+    minimum: $minimum-size,
+    default: $ripple-size,
+    maximum: $maximum-size,
+  ),
+) !default;
+
+$custom-property-prefix: 'radio';
+
+// TODO(b/188417756): `icon-size` token key is not supported.
+$light-theme: (
+  disabled-selected-icon-color: theme-color.$on-surface,
+  disabled-selected-icon-opacity: 0.38,
+  disabled-unselected-icon-color: theme-color.$on-surface,
+  disabled-unselected-icon-opacity: 0.38,
+  selected-focus-icon-color: theme-color.$primary,
+  selected-focus-state-layer-color: theme-color.$primary,
+  selected-focus-state-layer-opacity: 0.12,
+  selected-hover-icon-color: theme-color.$primary,
+  selected-hover-state-layer-color: theme-color.$primary,
+  selected-hover-state-layer-opacity: 0.04,
+  selected-icon-color: theme-color.$primary,
+  selected-pressed-icon-color: theme-color.$primary,
+  selected-pressed-state-layer-color: theme-color.$primary,
+  selected-pressed-state-layer-opacity: 0.1,
+  state-layer-size: $ripple-size,
+  unselected-focus-icon-color: theme-color.$on-surface,
+  unselected-focus-state-layer-color: theme-color.$on-surface,
+  unselected-focus-state-layer-opacity: 0.12,
+  unselected-hover-icon-color: theme-color.$on-surface,
+  unselected-hover-state-layer-color: theme-color.$on-surface,
+  unselected-hover-state-layer-opacity: 0.04,
+  unselected-icon-color: theme-color.$on-surface,
+  unselected-pressed-icon-color: theme-color.$on-surface,
+  unselected-pressed-state-layer-color: theme-color.$on-surface,
+  unselected-pressed-state-layer-opacity: 0.1,
+);
+
+@mixin theme($theme) {
+  $theme: theme.validate-theme($light-theme, $theme);
+  @include keys.declare-custom-properties(
+    $theme,
+    $prefix: $custom-property-prefix
+  );
+}
+
+@mixin theme-styles($theme) {
+  $theme: theme.validate-theme($light-theme, $theme);
+  $theme: theme.create-theme-vars($theme, $prefix: $custom-property-prefix);
+
+  @include _disabled-selected-icon-color(
+    map.get($theme, disabled-selected-icon-color)
+  );
+  @include _disabled-selected-icon-opacity(
+    map.get($theme, disabled-selected-icon-opacity)
+  );
+  @include _disabled-unselected-icon-color(
+    map.get($theme, disabled-unselected-icon-color)
+  );
+  @include _disabled-unselected-icon-opacity(
+    map.get($theme, disabled-unselected-icon-opacity)
+  );
+
+  // selected
+  @include _selected-icon-color(map.get($theme, selected-icon-color));
+
+  // unselected
+  @include _unselected-icon-color(map.get($theme, unselected-icon-color));
+  @include _ripple-padding(map.get($theme, state-layer-size));
+  // Set touch target size same as ripple size.
+  @include touch-target(
+    $size: map.get($theme, state-layer-size),
+    $ripple-size: map.get($theme, state-layer-size)
+  );
+
+  @include ripple-theme.theme(
+    (
+      hover-state-layer-color:
+        map.get($theme, unselected-hover-state-layer-color),
+      focus-state-layer-color:
+        map.get($theme, unselected-focus-state-layer-color),
+      pressed-state-layer-color:
+        map.get($theme, unselected-pressed-state-layer-color),
+      hover-state-layer-opacity:
+        map.get($theme, unselected-hover-state-layer-opacity),
+      focus-state-layer-opacity:
+        map.get($theme, unselected-focus-state-layer-opacity),
+      pressed-state-layer-opacity:
+        map.get($theme, unselected-pressed-state-layer-opacity),
+    )
+  );
+
+  @include _checked-selector() {
+    @include ripple-theme.theme(
+      (
+        hover-state-layer-color:
+          map.get($theme, selected-hover-state-layer-color),
+        focus-state-layer-color:
+          map.get($theme, selected-focus-state-layer-color),
+        pressed-state-layer-color:
+          map.get($theme, selected-pressed-state-layer-color),
+        hover-state-layer-opacity:
+          map.get($theme, selected-hover-state-layer-opacity),
+        focus-state-layer-opacity:
+          map.get($theme, selected-focus-state-layer-opacity),
+        pressed-state-layer-opacity:
+          map.get($theme, selected-pressed-state-layer-opacity),
+      )
+    );
+  }
+}
+
+@mixin _disabled-selected-icon-color($color) {
+  @include disabled-checked-stroke-color($color);
+  @include disabled-ink-color($color);
+}
+
+@mixin _disabled-selected-icon-opacity($opacity) {
+  @include _disabled-checked-stroke-opacity($opacity);
+  @include _disabled-ink-opacity($opacity);
+}
+
+@mixin _disabled-unselected-icon-color($color) {
+  @include disabled-unchecked-stroke-color($color);
+}
+
+@mixin _disabled-unselected-icon-opacity($opacity) {
+  @include _disabled-unchecked-stroke-opacity($opacity);
+}
+
+@mixin _selected-icon-color($color) {
+  @include checked-stroke-color($color);
+  @include ink-color($color);
+}
+
+@mixin _unselected-icon-color($color) {
+  @include unchecked-stroke-color($color);
+}
+
+///
+/// Sets the stroke color of an unchecked, enabled radio button.
+/// @param {Color} $color - The desired stroke color.
+///
+@mixin unchecked-stroke-color($color) {
+  @include _if-enabled-unchecked {
+    @include _stroke-color($color);
+  }
+}
+
+///
+/// Sets the stroke color of a checked, enabled radio button.
+/// @param {Color} $color - The desired stroke color.
+///
+@mixin checked-stroke-color($color) {
+  @include _if-enabled-checked {
+    @include _stroke-color($color);
+  }
+}
+
+///
+/// Sets the ink color of an enabled radio button.
+/// @param {Color} $color - The desired ink color.
+///
+@mixin ink-color($color) {
+  @include _if-enabled {
+    @include _ink-color($color);
+  }
+}
+
+///
+/// Sets the stroke color of an unchecked, disabled radio button.
+/// @param {Color} $color - The desired stroke color.
+///
+@mixin disabled-unchecked-stroke-color($color) {
+  @include _if-disabled-unchecked {
+    @include _stroke-color($color);
+  }
+}
+
+@mixin _disabled-unchecked-stroke-opacity($opacity) {
+  @include _if-disabled-unchecked {
+    @include _stroke-opacity($opacity);
+  }
+}
+
+///
+/// Sets the stroke color of a checked, disabled radio button.
+/// @param {Color} $color - The desired stroke color.
+///
+@mixin disabled-checked-stroke-color($color) {
+  @include if-disabled-checked_ {
+    @include _stroke-color($color);
+  }
+}
+
+@mixin _disabled-checked-stroke-opacity($opacity) {
+  @include if-disabled-checked_ {
+    @include _stroke-opacity($opacity);
+  }
+}
+
+///
+/// Sets the ink color of a disabled radio button.
+/// @param {Color} $color - The desired ink color
+///
+@mixin disabled-ink-color($color) {
+  @include if-disabled_ {
+    @include _ink-color($color);
+  }
+}
+
+@mixin _disabled-ink-opacity($opacity) {
+  @include if-disabled_ {
+    @include _ink-opacity($opacity);
+  }
+}
+
+@mixin focus-indicator-color($color) {
+  .md3-radio__background::before {
+    @include mdc-theme.property(background-color, $color);
+  }
+}
+
+///
+/// Sets radio touch target size which can be more than the ripple size. Param `$ripple-size` is required for custom
+/// ripple size.
+///
+/// @param {Number} $size Size of touch target (Native input) in `px`.
+/// @param {Number} $ripple-size Size of ripple in `px`. Required only for custom ripple size.
+///
+@mixin touch-target($size: $ripple-size, $ripple-size: $ripple-size) {
+  $offset: 'calc((__ripple_size - __size) / 2)';
+  $replace: (
+    __ripple_size: $ripple-size,
+    __size: $size,
+  );
+
+  .md3-radio__native-control {
+    @include mdc-theme.property('top', $offset, $replace: $replace);
+    @include mdc-theme.property('right', $offset, $replace: $replace);
+    @include mdc-theme.property('left', $offset, $replace: $replace);
+    @include mdc-theme.property('width', $size);
+    @include mdc-theme.property('height', $size);
+  }
+}
+
+///
+/// Sets density scale for radio.
+///
+/// @param {Number | String} $density-scale - Density scale value for component. Supported density scale values
+///     `-3`, `-2`, `-1`, `0`.
+///
+@mixin density($density-scale) {
+  $size: density-functions.prop-value(
+    $density-config: $density-config,
+    $density-scale: $density-scale,
+    $property-name: size,
+  );
+
+  @include _ripple-padding($size);
+  // Sets touch target size same as ripple size.
+  @include touch-target($size: $size, $ripple-size: $size);
+
+  @if $density-scale != 0 {
+    @include touch-target-reset_();
+  }
+}
+
+@mixin _ripple-padding($size) {
+  $replace: (
+    __size: $size,
+    __icon_size: $icon-size,
+  );
+
+  $padding: 'calc((__size - __icon_size) / 2)';
+
+  @include mdc-theme.property('padding', $padding, $replace: $replace);
+}
+
+///
+/// Resets touch target-related styles. This is called from the density mixin to
+/// automatically remove the increased touch target, since dense components
+/// don't have the same default a11y requirements.
+/// @access private
+///
+@mixin touch-target-reset_() {
+  margin: 0;
+}
+
+///
+/// Helps select the radio background only when its native control is in the
+/// enabled state.
+/// @access private
+///
+@mixin _if-enabled {
+  .md3-radio__native-control:enabled + {
+    @content;
+  }
+}
+
+///
+/// Helps select the radio background only when its native control is in the
+/// enabled & unchecked state.
+/// @access private
+///
+@mixin _if-enabled-unchecked {
+  .md3-radio__native-control:enabled:not(:checked) + {
+    @content;
+  }
+}
+
+///
+/// Helps select the radio background only when its native control is in the
+/// enabled & checked state.
+/// @access private
+///
+@mixin _if-enabled-checked {
+  .md3-radio__native-control:enabled:checked + {
+    @content;
+  }
+}
+
+///
+/// Helps select the radio background only when its native control is in the
+/// disabled state.
+/// @access private
+///
+@mixin if-disabled_ {
+  [aria-disabled='true'] .md3-radio__native-control,
+  .md3-radio__native-control:disabled {
+    + {
+      @content;
+    }
+  }
+}
+
+///
+/// Helps select the radio background only when its native control is in the
+/// disabled & unchecked state.
+/// @access private
+///
+@mixin _if-disabled-unchecked {
+  [aria-disabled='true'] .md3-radio__native-control,
+  .md3-radio__native-control:disabled {
+    &:not(:checked) + {
+      @content;
+    }
+  }
+}
+
+///
+/// Helps select the radio background only when its native control is in the
+/// disabled & checked state.
+/// @access private
+///
+@mixin if-disabled-checked_ {
+  [aria-disabled='true'] .md3-radio__native-control,
+  .md3-radio__native-control:disabled {
+    &:checked + {
+      @content;
+    }
+  }
+}
+
+///
+/// Sets the ink color for radio. This is wrapped in a mixin
+/// that qualifies state such as `_if-enabled`
+/// @access private
+///
+@mixin _ink-color($color) {
+  .md3-radio__background .md3-radio__inner-circle {
+    @include mdc-theme.property(border-color, $color);
+  }
+}
+
+@mixin _ink-opacity($opacity) {
+  .md3-radio__background .md3-radio__inner-circle {
+    @include mdc-theme.property(opacity, $opacity);
+  }
+}
+
+///
+/// Sets the stroke color for radio. This is wrapped in a mixin
+/// that qualifies state such as `_if-enabled`
+/// @access private
+///
+@mixin _stroke-color($color) {
+  .md3-radio__background .md3-radio__outer-circle {
+    @include mdc-theme.property(border-color, $color);
+  }
+}
+
+@mixin _stroke-opacity($opacity) {
+  .md3-radio__background .md3-radio__outer-circle {
+    @include mdc-theme.property(opacity, $opacity);
+  }
+}
+
+@mixin _checked-selector() {
+  @include shadow-dom.host-aware(selector.append(&, '[checked]')) {
+    @content;
+  }
+}
