@@ -1,0 +1,26 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@use 'sass:map';
+
+$light-theme: (
+  container-height: 56px,
+  container-padding-horizontal: 16px,
+);
+
+$selectors: (
+  disabled: '.mdc-field--disabled',
+  error: '.mdc-field--error',
+  focus: '.mdc-field--focus',
+  hover: ':hover',
+);
+
+@mixin theme-styles($theme) {
+  @include _container-height(map.get($theme, container-height));
+}
+
+@mixin _container-height($height) {
+  min-height: $height;
+}
