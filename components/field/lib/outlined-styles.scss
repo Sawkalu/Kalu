@@ -1,0 +1,13 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@use './outlined-field-theme';
+@use './outlined-field';
+
+@include outlined-field.static-styles;
+
+.md3-field--outlined {
+  @include outlined-field-theme.theme-styles(outlined-field-theme.$light-theme);
+}
