@@ -1,0 +1,14 @@
+//
+// Copyright 2022 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@mixin static-styles() {
+  .md3-list-item {
+    @include root;
+  }
+}
+
+@mixin root() {
+  color: unset;
+}
