@@ -1,0 +1,506 @@
+//
+// Copyright 2022 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// TODO(b/228217731): Remove MDC/MWC dependencies
+@use 'sass:map';
+@use '../../focus/lib/focus-ring-theme';
+@use '../../sass/theme';
+// TODO(b/228865846): update to latest (see go/m3-web-navigation-bar-tokens-diff)
+@use '../../tokens/v0_75' as tokens;
+@use 'third_party/javascript/material_web_components/m3/ripple/ripple-theme';
+@use '@material/theme/state';
+@use '@material/theme/shadow-dom';
+@use '@material/theme/theme-color';
+@use '@material/theme/keys';
+@use '@material/typography/typography';
+
+$_custom-property-prefix: 'navigation-bar';
+
+$light-theme: tokens.md-comp-navigation-bar-values();
+$dark-theme: tokens.md-comp-navigation-bar-values(
+  (
+    md-sys-color: tokens.md-sys-color-values-dark(),
+  ),
+  $exclude-hardcoded-values: true
+);
+
+@mixin theme($theme) {
+  $theme: theme.validate-theme($light-theme, $theme);
+
+  @if shadow-dom.$css-selector-fallback-declarations {
+    @include theme-styles($theme);
+  }
+  $theme: theme.create-theme-vars($theme, $_custom-property-prefix);
+
+  @include theme.emit-theme-vars($theme);
+}
+
+@mixin theme-styles($theme) {
+  $theme: theme.validate-theme-styles(
+    $light-theme,
+    $theme,
+    $require-all: false
+  );
+
+  $theme: theme.create-theme-vars($theme, $_custom-property-prefix);
+
+  @include _icon-size(map.get($theme, icon-size));
+  @include _active-icon-color(
+    (
+      default: map.get($theme, active-icon-color),
+      hover: map.get($theme, active-hover-icon-color),
+      focus: map.get($theme, active-focus-icon-color),
+      pressed: map.get($theme, active-pressed-icon-color),
+    )
+  );
+  @include _inactive-icon-color(
+    (
+      default: map.get($theme, inactive-icon-color),
+      hover: map.get($theme, inactive-hover-icon-color),
+      focus: map.get($theme, inactive-focus-icon-color),
+      pressed: map.get($theme, inactive-pressed-icon-color),
+    )
+  );
+
+  @include _set-label-text-typography(
+    (
+      family: map.get($theme, label-text-font),
+      size: map.get($theme, label-text-size),
+      tracking: map.get($theme, label-text-tracking),
+      weight: map.get($theme, label-text-weight),
+    )
+  );
+
+  @include _active-label-text-color(
+    (
+      default: map.get($theme, active-label-text-color),
+      hover: map.get($theme, active-hover-label-text-color),
+      focus: map.get($theme, active-focus-label-text-color),
+      pressed: map.get($theme, active-pressed-label-text-color),
+    )
+  );
+  @include _inactive-label-text-color(
+    (
+      default: map.get($theme, inactive-label-text-color),
+      hover: map.get($theme, inactive-hover-label-text-color),
+      focus: map.get($theme, inactive-focus-label-text-color),
+      pressed: map.get($theme, inactive-pressed-label-text-color),
+    )
+  );
+
+  @include _badge-color(map.get($theme, badge-color));
+  @include _badge-size(map.get($theme, badge-size));
+  @include _badge-shape(map.get($theme, badge-shape));
+  @include _badge-outline-color(map.get($theme, badge-outline-color));
+  @include _badge-outline-width(map.get($theme, badge-outline-width));
+
+  @include _large-badge-size(map.get($theme, large-badge-size));
+  @include _large-badge-shape(map.get($theme, large-badge-shape));
+  @include _large-badge-label-font-family(
+    map.get($theme, large-badge-label-font-family)
+  );
+  @include _large-badge-label-line-height(
+    map.get($theme, large-badge-label-line-height)
+  );
+  @include _large-badge-label-font-size(
+    map.get($theme, large-badge-label-font-size)
+  );
+  @include _large-badge-label-weight(map.get($theme, large-badge-label-weight));
+  @include _large-badge-label-letter-spacing(
+    map.get($theme, large-badge-label-letter-spacing)
+  );
+  @include _large-badge-outline-width(
+    map.get($theme, large-badge-outline-width)
+  );
+
+  @include _active-large-badge-color(map.get($theme, active-large-badge-color));
+  @include _active-large-badge-label-color(
+    map.get($theme, active-large-badge-label-color)
+  );
+  @include _active-large-badge-outline-color(
+    map.get($theme, active-large-badge-outline-color)
+  );
+
+  @include _inactive-large-badge-color(
+    map.get($theme, inactive-large-badge-color)
+  );
+  @include _inactive-large-badge-label-color(
+    map.get($theme, inactive-large-badge-label-color)
+  );
+  @include _inactive-large-badge-outline-color(
+    map.get($theme, inactive-large-badge-outline-color)
+  );
+
+  @include _active-indicator-color(map.get($theme, active-indicator-color));
+  @include _active-indicator-height(map.get($theme, active-indicator-height));
+  @include _active-indicator-width(map.get($theme, active-indicator-width));
+  @include _active-indicator-shape(map.get($theme, active-indicator-shape));
+
+  @include ripple-theme.theme(
+    (
+      hover-state-layer-color: map.get($theme, inactive-hover-state-layer-color),
+      focus-state-layer-color: map.get($theme, inactive-focus-state-layer-color),
+      pressed-state-layer-color:
+        map.get($theme, inactive-pressed-state-layer-color),
+      hover-state-layer-opacity: map.get($theme, hover-state-layer-opacity),
+      focus-state-layer-opacity: map.get($theme, focus-state-layer-opacity),
+      pressed-state-layer-opacity: map.get($theme, pressed-state-layer-opacity),
+    )
+  );
+
+  @include _is-active() {
+    @include ripple-theme.theme(
+      (
+        hover-state-layer-color: map.get($theme, active-hover-state-layer-color),
+        focus-state-layer-color: map.get($theme, active-focus-state-layer-color),
+        pressed-state-layer-color:
+          map.get($theme, active-pressed-state-layer-color),
+        hover-state-layer-opacity: map.get($theme, hover-state-layer-opacity),
+        focus-state-layer-opacity: map.get($theme, focus-state-layer-opacity),
+        pressed-state-layer-opacity:
+          map.get($theme, pressed-state-layer-opacity),
+      )
+    );
+  }
+
+  @include focus-ring-theme.theme(
+    (
+      container-outer-padding-vertical: -4px,
+      container-outer-padding-horizontal: -4px,
+    )
+  );
+}
+
+@mixin _icon-size($size) {
+  .md3-navigation-tab__icon {
+    width: $size;
+    height: $size;
+    font-size: $size;
+  }
+}
+
+@mixin _icon-color($color) {
+  .md3-navigation-tab__icon {
+    color: $color;
+
+    fill: currentColor;
+  }
+}
+
+@mixin _active-icon-color($color-or-map) {
+  &:not(:disabled) {
+    @include _set-active-icon-color(state.get-default-state($color-or-map));
+
+    &:hover {
+      @include _set-active-icon-color(state.get-hover-state($color-or-map));
+    }
+    &:focus {
+      @include _set-active-icon-color(state.get-focus-state($color-or-map));
+    }
+    &:active {
+      @include _set-active-icon-color(state.get-pressed-state($color-or-map));
+    }
+  }
+
+  &:disabled {
+    @include _set-active-icon-color(state.get-disabled-state($color-or-map));
+  }
+}
+
+@mixin _set-active-icon-color($color) {
+  @include _is-active() {
+    @include _icon-color($color);
+  }
+}
+
+@mixin _inactive-icon-color($color-or-map) {
+  &:not(:disabled) {
+    @include _set-inactive-icon-color(state.get-default-state($color-or-map));
+
+    &:hover {
+      @include _set-inactive-icon-color(state.get-hover-state($color-or-map));
+    }
+    &:focus {
+      @include _set-inactive-icon-color(state.get-focus-state($color-or-map));
+    }
+    &:active {
+      @include _set-inactive-icon-color(state.get-pressed-state($color-or-map));
+    }
+  }
+
+  &:disabled {
+    @include _set-inactive-icon-color(state.get-disabled-state($color-or-map));
+  }
+}
+
+@mixin _set-inactive-icon-color($color) {
+  @include _is-inactive() {
+    @include _icon-color($color);
+  }
+}
+
+@mixin _label-text-color($color) {
+  .md3-navigation-tab__label-text {
+    color: $color;
+  }
+}
+
+@mixin _active-label-text-color($color-or-map) {
+  &:not(:disabled) {
+    @include _set-active-label-text-color(
+      state.get-default-state($color-or-map)
+    );
+
+    &:hover {
+      @include _set-active-label-text-color(
+        state.get-hover-state($color-or-map)
+      );
+    }
+    &:focus {
+      @include _set-active-label-text-color(
+        state.get-focus-state($color-or-map)
+      );
+    }
+    &:active {
+      @include _set-active-label-text-color(
+        state.get-pressed-state($color-or-map)
+      );
+    }
+  }
+
+  &:disabled {
+    @include _set-active-label-text-color(
+      state.get-disabled-state($color-or-map)
+    );
+  }
+}
+
+@mixin _set-active-label-text-color($color) {
+  @include _is-active() {
+    @include _label-text-color($color);
+  }
+}
+
+@mixin _inactive-label-text-color($color-or-map) {
+  &:not(:disabled) {
+    @include _set-inactive-label-text-color(
+      state.get-default-state($color-or-map)
+    );
+
+    &:hover {
+      @include _set-inactive-label-text-color(
+        state.get-hover-state($color-or-map)
+      );
+    }
+    &:focus {
+      @include _set-inactive-label-text-color(
+        state.get-focus-state($color-or-map)
+      );
+    }
+    &:active {
+      @include _set-inactive-label-text-color(
+        state.get-pressed-state($color-or-map)
+      );
+    }
+  }
+
+  &:disabled {
+    @include _set-inactive-label-text-color(
+      state.get-disabled-state($color-or-map)
+    );
+  }
+}
+
+@mixin _set-inactive-label-text-color($color) {
+  @include _is-inactive() {
+    @include _label-text-color($color);
+  }
+}
+
+@mixin _set-label-text-typography($typography-map) {
+  $family: map.get($typography-map, family);
+  $size: map.get($typography-map, size);
+  $tracking: map.get($typography-map, tracking);
+  $weight: map.get($typography-map, weight);
+
+  font-family: $family;
+  font-size: $size;
+  letter-spacing: $tracking;
+  font-weight: $weight;
+}
+
+@mixin _badge-color($color) {
+  .md3-navigation-tab__badge:not(.md3-navigation-tab__badge-large) {
+    background-color: $color;
+  }
+}
+
+@mixin _badge-size($size) {
+  .md3-navigation-tab__badge:not(.md3-navigation-tab__badge-large) {
+    height: $size;
+    width: $size;
+  }
+}
+
+@mixin _badge-shape($shape-radius) {
+  .md3-navigation-tab__badge:not(.md3-navigation-tab__badge-large) {
+    border-radius: $shape-radius;
+  }
+}
+
+@mixin _badge-outline-color($color) {
+  .md3-navigation-tab__badge:not(.md3-navigation-tab__badge-large) {
+    border-color: $color;
+  }
+}
+
+@mixin _badge-outline-width($width) {
+  .md3-navigation-tab__badge:not(.md3-navigation-tab__badge-large) {
+    border-width: $width;
+  }
+}
+
+@mixin _large-badge-size($size) {
+  .md3-navigation-tab__badge-large {
+    height: $size;
+    min-width: $size;
+  }
+}
+
+@mixin _large-badge-shape($shape-radius) {
+  .md3-navigation-tab__badge-large {
+    border-radius: $shape-radius;
+  }
+}
+
+@mixin _large-badge-label-font-family($font-family) {
+  .md3-navigation-tab__badge-value {
+    font-family: $font-family;
+  }
+}
+
+@mixin _large-badge-label-font-size($font-size) {
+  .md3-navigation-tab__badge-value {
+    font-size: $font-size;
+  }
+}
+
+@mixin _large-badge-label-letter-spacing($letter-spacing) {
+  .md3-navigation-tab__badge-value {
+    letter-spacing: $letter-spacing;
+  }
+}
+
+@mixin _large-badge-label-line-height($line-height) {
+  .md3-navigation-tab__badge-value {
+    line-height: $line-height;
+  }
+}
+
+@mixin _large-badge-label-weight($weight) {
+  .md3-navigation-tab__badge-value {
+    font-weight: $weight;
+  }
+}
+
+@mixin _large-badge-outline-width($width) {
+  .md3-navigation-tab__badge-large {
+    border-width: $width;
+  }
+}
+
+@mixin _active-large-badge-color($color) {
+  @include _is-active() {
+    @include _large-badge-color($color);
+  }
+}
+
+@mixin _inactive-large-badge-color($color) {
+  @include _is-inactive() {
+    @include _large-badge-color($color);
+  }
+}
+
+@mixin _large-badge-color($color) {
+  .md3-navigation-tab__badge-large {
+    background-color: $color;
+  }
+}
+
+@mixin _active-large-badge-label-color($color) {
+  @include _is-active() {
+    @include _large-badge-label-color($color);
+  }
+}
+
+@mixin _inactive-large-badge-label-color($color) {
+  @include _is-inactive() {
+    @include _large-badge-label-color($color);
+  }
+}
+
+@mixin _large-badge-label-color($color) {
+  .md3-navigation-tab__badge-large {
+    color: $color;
+  }
+}
+
+@mixin _active-large-badge-outline-color($color) {
+  @include _is-active() {
+    @include _large-badge-outline-color($color);
+  }
+}
+
+@mixin _inactive-large-badge-outline-color($color) {
+  @include _is-inactive() {
+    @include _large-badge-outline-color($color);
+  }
+}
+
+@mixin _large-badge-outline-color($color) {
+  .md3-navigation-tab__badge-large {
+    border-color: $color;
+  }
+}
+
+@mixin _active-indicator-color($color) {
+  .md3-navigation-tab__active-indicator {
+    background-color: $color;
+  }
+}
+
+@mixin _active-indicator-height($height) {
+  // Keep icon-content in sync with active-indicator size.
+  .md3-navigation-tab__active-indicator,
+  .md3-navigation-tab__icon-content {
+    height: $height;
+  }
+}
+
+@mixin _active-indicator-width($width) {
+  // Keep icon-content in sync with active-indicator size.
+  &.md3-navigation-tab--active .md3-navigation-tab__active-indicator,
+  .md3-navigation-tab__icon-content {
+    width: $width;
+  }
+}
+
+@mixin _active-indicator-shape($shape-radius) {
+  .md3-navigation-tab__active-indicator {
+    border-radius: $shape-radius;
+  }
+}
+
+@mixin _is-active() {
+  &.md3-navigation-tab--active {
+    @content;
+  }
+}
+
+@mixin _is-inactive() {
+  &:not(.md3-navigation-tab--active) {
+    @content;
+  }
+}
