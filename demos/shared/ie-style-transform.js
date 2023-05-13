@@ -1,0 +1,1 @@
+!function(){"use strict";for(var e=document.head.querySelectorAll('link[rel="preload"][as="style"]'),t=0;t<e.length;t++){var r=e[t];r.removeAttribute("onload"),r.setAttribute("rel","stylesheet"),r.removeAttribute("as")}}();
