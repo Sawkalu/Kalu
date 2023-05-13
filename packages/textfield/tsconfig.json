@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "."
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../base"
+    },
+    {
+      "path": "../line-ripple"
+    },
+    {
+      "path": "../icon"
+    },
+    {
+      "path": "../notched-outline"
+    },
+    {
+      "path": "../floating-label"
+    }
+  ],
+  "exclude": [
+    "src/test/*.ts"
+  ]
+}
