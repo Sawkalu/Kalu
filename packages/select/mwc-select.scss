@@ -1,0 +1,123 @@
+/**
+@license
+Copyright 2018 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+@import '@material/floating-label/mixins';
+@import '@material/line-ripple/mixins';
+@import '@material/theme/mixins';
+@import '@material/select/mdc-select';
+@import '@material/select/_variables';
+
+
+// Any rule selecting `.mdc-select__native-control` now also selects the
+// <select> in this host's normal children.
+//
+// NOTE: The element selected by `::slotted(select)` is in a different tree, so
+// complex selectors with combinators to the right of
+// `.mdc-select__native-control` will produce rules that can never match an
+// element. These are covered later.
+//
+// NOTE: Shady DOM only supports using `::slotted()` as part of a trailing
+// compound selector in a complex selector.
+
+// `:host` is required for Shadow DOM.
+// `.mdc-select` is required for Shady DOM.
+:host, .mdc-select {
+  ::slotted(select:focus) {
+    @extend .mdc-select__native-control:focus;
+  }
+
+  ::slotted(select:hover) {
+    @extend .mdc-select__native-control:hover;
+  }
+
+  ::slotted(select) {
+    @extend .mdc-select__native-control;
+
+    // TODO: Remove when autoprefixer is reenabled.
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+}
+
+
+// Rewrite selectors using combinators to the right of
+// `.mdc-select__native-control`. Selectors that use
+// `.mdc-select__native-control:focus` and combinators to the right are
+// rewritten to `:host(._focus) & #{$RIGHT}` where `$RIGHT` is the complex
+// selector to the right of the first combinator following
+// `.mdc-select__native-control:focus`.
+//
+// These would be slightly more similar to their originals if they were
+// converted to `:host(._focus & slot #{$RIGHT}`, with `$RIGHT` being the full
+// relative selector (including leading combinator) to right of the
+// `.mdc-select__native-control:focus` but Shady DOM emulates slots by replacing
+// them with their assigned nodes (recursively), so no slot will exist to match.
+//
+// Example:
+//
+//   ```
+//   A {
+//     .mdc-select__native-control:focus ~ B { ... }
+//   }
+//   ```
+//
+//   becomes
+//
+//   ```
+//   A {
+//     :host(._focus) & B { ... }
+//   }
+//   ```
+//
+// NOTE: These mixins are arranged with definitions preceding uses; otherwise,
+// Sass is occasionally unable to find them.
+
+@mixin mwc__mdc-select-focused-line-ripple_ {
+  // https://github.com/material-components/material-components-web/blob/f6055ea91867fbac622c0efad7b40f8dd8e04292/packages/mdc-select/_mixins.scss#L69
+  // .mdc-select__native-control:focus ~ .mdc-line-ripple
+  :host(._focused) & .mdc-line-ripple {
+    @content;
+  }
+}
+
+@mixin mwc__mdc-select-focused-line-ripple-color_($color) {
+  @include mwc__mdc-select-focused-line-ripple_ {
+    @include mdc-line-ripple-color($color);
+  }
+}
+
+@mixin mwc__mdc-select-focused-bottom-line-color($color) {
+  &:not(.mdc-select--disabled) {
+    @include mwc__mdc-select-focused-line-ripple-color_($color);
+  }
+}
+
+@mixin mwc__mdc-select-focused-label-color($color) {
+  &:not(.mdc-select--disabled) {
+    // https://github.com/material-components/material-components-web/blob/f6055ea91867fbac622c0efad7b40f8dd8e04292/packages/mdc-select/_mixins.scss#L37
+    // .mdc-select__native-control:focus ~ .mdc-floating-label
+    :host(._focused) & .mdc-floating-label {
+      @include mdc-floating-label-ink-color(mdc-theme-prop-value($color));
+    }
+  }
+}
+
+.mdc-select {
+  @include mwc__mdc-select-focused-bottom-line-color(primary);
+  @include mwc__mdc-select-focused-label-color($mdc-select-focused-label-color);
+}
