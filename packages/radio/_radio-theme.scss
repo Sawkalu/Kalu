@@ -1,0 +1,51 @@
+/**
+ * @license
+ * Copyright 2020 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@use 'sass:map';
+@use 'sass:selector';
+@use '@material/theme/css';
+@use '@material/theme/shadow-dom';
+@use 'third_party/javascript/material_web_components/ripple/ripple-theme';
+
+@mixin theme($theme) {
+  @include css.declaration(
+    --mdc-theme-secondary,
+    map.get($theme, checked-color)
+  );
+  @include _hover-selector() {
+    @include css.declaration(
+      --mdc-theme-secondary,
+      map.get($theme, checked-hover-color)
+    );
+  }
+  @include css.declaration(--mdc-radio-unchecked-color, map.get($theme, color));
+  @include _hover-selector() {
+    @include css.declaration(
+      --mdc-radio-unchecked-color,
+      map.get($theme, hover-color)
+    );
+  }
+  @include css.declaration(
+    --mdc-radio-disabled-color,
+    map.get($theme, disabled-color)
+  );
+  @include ripple-theme.theme(
+    (
+      state: map.get($theme, ripple-color),
+      opacity: map.get($theme, ripple-opacity),
+    )
+  );
+}
+
+@mixin _hover-selector() {
+  @include shadow-dom.host-aware(
+    selector.append(&, ':active'),
+    selector.append(&, ':hover'),
+    selector.append(&, ':focus-within')
+  ) {
+    @content;
+  }
+}
