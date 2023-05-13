@@ -1,0 +1,100 @@
+/**
+@license
+Copyright 2018 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+@import '@material/icon-button/_variables.scss';
+@import '@material/icon-button/mdc-icon-button.scss';
+@import '@material/mwc-icon/src/_mwc-icon.scss';
+@import '@material/theme/_mixins.scss';
+
+@include mdc-ripple-common(mdc-feature-all());
+
+@mixin mdc-icon-button-size-var-aware($size, $query: mdc-feature-all()) {
+  $feat-structure: mdc-feature-create-target($query, structure);
+
+  @include mdc-feature-targets($feat-structure) {
+    width: $size;
+    height: $size;
+    padding: calc((#{$size} - var(--mdc-icon-size, #{$mdc-icon-button-icon-size})) / 2);
+  }
+}
+
+:host {
+  display: inline-block;
+  outline: none;
+}
+
+.material-icons {
+  @extend %material-icons;
+}
+
+:host,
+.mdc-icon-button {
+  /**
+   * Any vertical-align other than the default of "baseline" will work here (and
+   * "top" is the shortest).
+   *
+   * In general, when an inline-block element has vertical-align: baseline and
+   * also a fixed height, extra space may "appear" below it. This is because the
+   * baseline it is aligned to is not the very bottom of the line, it's the line
+   * above the "descenders" (e.g. the tail of a "y" or "j"). This means the
+   * container must grow to accomodate both the fixed height inline-element, and
+   * the descender height below it.
+   *
+   * For unknown reasons, in this particular case, this only causes incorrect
+   * alignment in IE/Edge.
+   *
+   * IE needs the vertical-align on both the button and the host element, while
+   * Edge only needs it on the button to fix the issue.
+   */
+  vertical-align: top;
+}
+
+.mdc-icon-button {
+  @include mdc-icon-button-size-var-aware(var(--mdc-icon-button-size, #{$mdc-icon-button-size}));
+
+  > i {
+    position: absolute;
+    top: 0;
+    padding-top: inherit;
+  }
+
+  i,
+  svg,
+  img,
+  ::slotted(*) {
+    display: block;
+    $feat-structure: mdc-feature-create-target(mdc-feature-all(), structure);
+    @include mdc-feature-targets($feat-structure) {
+      width: var(--mdc-icon-size, #{$mdc-icon-button-icon-size});
+      height: var(--mdc-icon-size, #{$mdc-icon-button-icon-size});
+    }
+  }
+}
+
+// hack for top-app-bar ripple coloring of icon-buttons
+.mdc-ripple-upgraded {
+  &:focus::before, &:focus::after {
+    @include mdc-theme-prop(background-color, (
+      varname: --mdc-theme-on-primary,
+      fallback: currentColor,
+    ));
+    @include mdc-theme-prop(opacity, (
+      varname: --mdc-icon-button-ripple-opacity,
+      fallback: 0.12,
+    ));
+  }
+}
