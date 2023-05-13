@@ -1,0 +1,27 @@
+{
+  "name": "@material/mwc-checkbox",
+  "version": "0.14.1",
+  "description": "",
+  "main": "mwc-checkbox.js",
+  "module": "mwc-checkbox.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/material-components/material-components-web-components.git",
+    "directory": "packages/checkbox"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@material/checkbox": "=6.0.0-canary.6a40ef217.0",
+    "@material/mwc-base": "^0.14.1",
+    "@material/mwc-ripple": "^0.14.1",
+    "lit-element": "^2.3.0",
+    "tslib": "^1.10.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

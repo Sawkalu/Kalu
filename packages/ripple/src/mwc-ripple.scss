@@ -1,0 +1,96 @@
+/**
+@license
+Copyright 2018 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+@use '@material/ripple';
+@import '@material/ripple/mdc-ripple.scss';
+
+@mixin sizing() {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  @include mdc-theme-prop(top, (
+    varname: --mdc-ripple-surface-top,
+    fallback: 0
+  ));
+
+  @include mdc-theme-prop(left, (
+    varname: --mdc-ripple-surface-left,
+    fallback: 0
+  ));
+
+  @include mdc-theme-prop(border, (
+    varname: --mdc-ripple-surface-border,
+    fallback: initial
+  ));
+}
+
+:host {
+  display: block;
+  --mdc-ripple-fg-opacity: #{map-get($mdc-ripple-dark-ink-opacities, press)};
+  @include sizing();
+}
+
+/*
+ * Use custom primary and accent classes because mdc-ripple-surface--primary
+ * and --secondary override opacity
+ */
+.primary {
+  --mdc-ripple-color: var(--mdc-theme-primary, #{mdc-theme-prop-value(primary)});
+}
+
+.accent {
+  --mdc-ripple-color: var(--mdc-theme-secondary, #{mdc-theme-prop-value(secondary)});
+}
+
+/*
+ * Hide the ripple if disabled
+ */
+.disabled {
+  --mdc-ripple-color: transparent;
+}
+
+.mdc-ripple-surface {
+  @include sizing();
+
+  &.mdc-ripple-upgraded {
+    /* use inherit keyword to "reset" definition from mdc-ripple styles */
+    --mdc-ripple-fg-opacity: inherit;
+  }
+
+  @include ripple.states-base-color((
+    varname: --mdc-ripple-color,
+    fallback: #000
+  ));
+
+  &.mdc-ripple-upgraded--background-focused::before {
+    @include mdc-theme-prop(opacity, (
+      varname: --mdc-ripple-focus-opacity,
+      fallback: map-get($mdc-ripple-dark-ink-opacities, focus)
+    ));
+  }
+}
+
+.hover::before {
+  @include mdc-theme-prop(opacity, (
+    varname: --mdc-ripple-hover-opacity,
+    fallback: map-get($mdc-ripple-dark-ink-opacities, hover)
+  ));
+}

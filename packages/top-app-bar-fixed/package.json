@@ -1,0 +1,28 @@
+{
+  "name": "@material/mwc-top-app-bar-fixed",
+  "version": "0.14.1",
+  "description": "",
+  "main": "mwc-top-app-bar-fixed.js",
+  "module": "mwc-top-app-bar-fixed.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/material-components/material-components-web-components.git",
+    "directory": "packages/top-app-bar"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@material/mwc-base": "^0.14.1",
+    "@material/mwc-top-app-bar": "^0.14.1",
+    "@material/top-app-bar": "=6.0.0-canary.6a40ef217.0",
+    "lit-element": "^2.3.0",
+    "tslib": "^1.10.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
