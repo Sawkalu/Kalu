@@ -1,0 +1,195 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@use 'sass:map';
+@use '../../sass/theme';
+@use '@material/ripple/ripple-theme';
+@use '@material/theme/keys';
+@use '@material/theme/state';
+@use '@material/theme/theme-color';
+
+$_custom-property-prefix: 'icon-button';
+
+$light-theme: (
+  disabled-icon-color: theme-color.$on-surface,
+  disabled-icon-opacity: 0.38,
+  icon-size: 24px,
+  selected-focus-icon-color: theme-color.$primary,
+  selected-focus-state-layer-color: theme-color.$primary,
+  selected-focus-state-layer-opacity: 0.12,
+  selected-hover-icon-color: theme-color.$primary,
+  selected-hover-state-layer-color: theme-color.$primary,
+  selected-hover-state-layer-opacity: 0.08,
+  selected-icon-color: theme-color.$primary,
+  selected-pressed-icon-color: theme-color.$primary,
+  selected-pressed-state-layer-color: theme-color.$primary,
+  selected-pressed-state-layer-opacity: 0.12,
+  state-layer-shape: null,
+  state-layer-size: 48px,
+  unselected-focus-icon-color: theme-color.$primary,
+  unselected-focus-state-layer-color: theme-color.$primary,
+  unselected-focus-state-layer-opacity: 0.12,
+  unselected-hover-icon-color: theme-color.$primary,
+  unselected-hover-state-layer-color: theme-color.$primary,
+  unselected-hover-state-layer-opacity: 0.08,
+  unselected-icon-color: theme-color.$primary,
+  unselected-pressed-icon-color: theme-color.$primary,
+  unselected-pressed-state-layer-color: theme-color.$primary,
+  unselected-pressed-state-layer-opacity: 0.12,
+  // Deprecated
+  focus-icon-color: null,
+  focus-state-layer-color: null,
+  focus-state-layer-opacity: null,
+  hover-icon-color: null,
+  hover-state-layer-color: null,
+  hover-state-layer-opacity: null,
+  icon-color: null,
+  pressed-icon-color: null,
+  pressed-state-layer-color: null,
+  pressed-state-layer-opacity: null,
+);
+
+@mixin theme($theme) {
+  $theme: theme.validate-theme($light-theme, $theme);
+  $theme: theme.create-theme-vars($theme, $_custom-property-prefix);
+
+  @include theme.emit-theme-vars($theme);
+}
+
+@mixin theme-styles($theme) {
+  $theme: theme.validate-theme-styles(
+    $light-theme,
+    $theme,
+    $require-all: false
+  );
+  $theme: theme.create-theme-vars($theme, $_custom-property-prefix);
+
+  @include _icon-size(map.get($theme, icon-size));
+
+  .md3-icon-button {
+    @include _state-layer-size($size: map.get($theme, state-layer-size));
+    @include _disabled-icon-opacity(map.get($theme, disabled-icon-opacity));
+
+    @include _icon-color(
+      (
+        default: map.get($theme, unselected-icon-color),
+        disabled: map.get($theme, disabled-icon-color),
+        focus: map.get($theme, unselected-focus-icon-color),
+        hover: map.get($theme, unselected-hover-icon-color),
+        pressed: map.get($theme, unselected-pressed-icon-color),
+      )
+    );
+  }
+
+  .md3-icon-button--on {
+    @include _icon-color(
+      (
+        default: map.get($theme, selected-icon-color),
+        focus: map.get($theme, selected-focus-icon-color),
+        hover: map.get($theme, selected-hover-icon-color),
+        pressed: map.get($theme, selected-pressed-icon-color),
+      )
+    );
+  }
+
+  // States styles
+  @include ripple-theme.theme(
+    (
+      focus-state-layer-color:
+        map.get($theme, unselected-focus-state-layer-color),
+      focus-state-layer-opacity:
+        map.get($theme, unselected-focus-state-layer-opacity),
+      hover-state-layer-color:
+        map.get($theme, unselected-hover-state-layer-color),
+      hover-state-layer-opacity:
+        map.get($theme, unselected-hover-state-layer-opacity),
+      pressed-state-layer-color:
+        map.get($theme, unselected-pressed-state-layer-color),
+      pressed-state-layer-opacity:
+        map.get($theme, unselected-pressed-state-layer-opacity),
+    )
+  );
+
+  .md3-icon-button--on {
+    @include ripple-theme.theme(
+      (
+        focus-state-layer-color:
+          map.get($theme, selected-focus-state-layer-color),
+        focus-state-layer-opacity:
+          map.get($theme, selected-focus-state-layer-opacity),
+        hover-state-layer-color:
+          map.get($theme, selected-hover-state-layer-color),
+        hover-state-layer-opacity:
+          map.get($theme, selected-hover-state-layer-opacity),
+        pressed-state-layer-color:
+          map.get($theme, selected-pressed-state-layer-color),
+        pressed-state-layer-opacity:
+          map.get($theme, selected-pressed-state-layer-opacity),
+      )
+    );
+  }
+}
+
+@mixin _state-layer-size($size) {
+  height: $size;
+  width: $size;
+}
+
+@mixin _icon-size($size) {
+  font-size: $size;
+
+  svg,
+  img {
+    height: $size;
+    width: $size;
+  }
+}
+
+///
+/// Sets the icon color to the given color.
+/// @param {map} $color-map - The desired icon color, specified as a map of
+///     colors with states {default, disabled, focus, hover, pressed} as keys.
+/// @access private
+///
+@mixin _icon-color($color-map) {
+  @include _set-icon-color(state.get-default-state($color-map));
+
+  $disabled: state.get-disabled-state($color-map);
+  &:disabled {
+    @include _set-icon-color($disabled);
+  }
+
+  $focus: state.get-focus-state($color-map);
+  @include ripple-theme.focus {
+    @include _set-icon-color($focus);
+  }
+
+  $hover: state.get-hover-state($color-map);
+  &:hover {
+    @include _set-icon-color($hover);
+  }
+
+  $pressed: state.get-pressed-state($color-map);
+  @include ripple-theme.active {
+    @include _set-icon-color($pressed);
+  }
+}
+
+///
+/// Sets the font color to the provided color value.
+/// @param {Color} $color - The desired font color.
+///
+@mixin _set-icon-color($color) {
+  color: $color;
+}
+
+///
+/// Sets the icon opacity to the given opacity.
+///
+@mixin _disabled-icon-opacity($opacity) {
+  &:disabled {
+    opacity: $opacity;
+  }
+}
