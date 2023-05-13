@@ -1,0 +1,23 @@
+//
+// Copyright 2021 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+//
+
+@mixin static-styles() {
+  :host {
+    @include host;
+  }
+
+  .md3-text-field__input {
+    @include input;
+  }
+}
+
+@mixin host() {
+  display: inline-flex;
+}
+
+@mixin input() {
+  background: none;
+  border: none;
+}
